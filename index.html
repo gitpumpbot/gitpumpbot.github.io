@@ -2,34 +2,672 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0; url=https://gitpump.com" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GitPump</title>
-  <meta name="description" content="Launch tokens on Pump.fun, Bags.fm, Clanker, and Four.meme directly from a GitHub comment." />
-  <meta property="og:title" content="GitPump" />
-  <meta property="og:description" content="Launch tokens on Pump.fun, Bags.fm, Clanker, and Four.meme directly from a GitHub comment." />
-  <meta property="og:image" content="https://gitpump.com/opengraph.jpg" />
-  <meta property="og:url" content="https://gitpump.com" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:image" content="https://gitpump.com/opengraph.jpg" />
+  <title>GitPump — Launch Crypto Tokens from GitHub</title>
+  <link rel="icon" type="image/png" href="https://gitpump.com/gitpump-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+
   <style>
+    :root {
+      --bg:        #0b1a20;
+      --bg-card:   #0e2028;
+      --bg-deep:   #071318;
+      --border:    #183040;
+      --green:     #2cc158;
+      --green-dim: #1d8a3e;
+      --text:      #e2f0f5;
+      --muted:     #6a97a8;
+      --dim:       #2e5060;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #0d1117; color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-    .wrap { text-align: center; padding: 2rem; }
-    img { width: 72px; height: 72px; border-radius: 16px; margin-bottom: 1.5rem; }
-    h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
-    p { color: #8b949e; margin-bottom: 1.5rem; }
-    a { display: inline-block; background: #238636; color: #fff; padding: 0.6rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; }
-    a:hover { background: #2ea043; }
+
+    html { background: #0b1a20; max-width: 100vw; overflow-x: hidden; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.25;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(20px);
+      background: rgba(11,26,32,0.85);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1100px; margin: auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo img { width: 28px; height: 28px; }
+    .nav-logo span { font-weight: 800; font-size: 1rem; color: var(--text); }
+    .nav-logo span em { color: var(--green); font-style: normal; }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-x { color: rgba(255,255,255,0.5); transition: color 0.2s; display: flex; align-items: center; }
+    .nav-x:hover { color: #fff; }
+    .nav-cta {
+      background: var(--green); color: #000; font-weight: 700;
+      font-size: 0.85rem; padding: 8px 18px; border-radius: 8px;
+      text-decoration: none; transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* ── SECTIONS ── */
+    section { position: relative; z-index: 1; }
+
+    .wrap { max-width: 1100px; margin: auto; padding: 0 24px; }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: 120px 24px 80px;
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 900; line-height: 1.1;
+      letter-spacing: -0.03em; margin-bottom: 20px;
+    }
+    .hero h1 em { color: var(--green); font-style: normal; }
+    .hero p {
+      font-size: 1.1rem; color: var(--muted);
+      max-width: 600px; margin: 0 auto 40px;
+    }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--green); color: #000;
+      font-weight: 700; font-size: 0.95rem;
+      padding: 12px 28px; border-radius: 10px;
+      text-decoration: none; transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-ghost {
+      background: transparent; color: var(--text);
+      font-weight: 600; font-size: 0.95rem;
+      padding: 12px 28px; border-radius: 10px;
+      border: 1px solid var(--border); text-decoration: none;
+      transition: border-color 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--green); }
+
+    /* ── CHAINS STRIP ── */
+    .chains-strip {
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; flex-wrap: wrap;
+      padding: 0 24px 80px;
+    }
+    .chain-pill {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 999px; padding: 8px 18px;
+      font-size: 0.85rem; font-weight: 600;
+    }
+    .chain-pill img { width: 20px; height: 20px; border-radius: 50%; }
+    .chain-pill.pumpfun  { border-color: rgba(0,192,77,0.4);  color: #00c04d; }
+    .chain-pill.bags     { border-color: rgba(0,170,85,0.4);  color: #00aa55; }
+    .chain-pill.clanker  { border-color: rgba(124,58,237,0.4); color: #9b6ef3; }
+    .chain-pill.fourmeme { border-color: rgba(217,119,6,0.4); color: #f59e0b; }
+
+    /* ── SECTION HEADER ── */
+    .section-label {
+      display: inline-block;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--green);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 1rem; color: var(--muted); max-width: 520px;
+    }
+    .section-header { margin-bottom: 56px; }
+
+    /* ── HOW IT WORKS ── */
+    .how { padding: 80px 0; }
+    .steps { display: flex; flex-direction: column; gap: 0; }
+    .step {
+      display: grid; grid-template-columns: 56px 1fr;
+      gap: 0 28px; padding: 36px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      width: 48px; height: 48px;
+      background: rgba(44,193,88,0.08);
+      border: 1px solid rgba(44,193,88,0.25);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 800; color: var(--green);
+      flex-shrink: 0;
+    }
+    .step-body h3 {
+      font-size: 1.15rem; font-weight: 700; margin-bottom: 8px;
+    }
+    .step-body p { color: var(--muted); font-size: 0.95rem; }
+
+    /* ── INSTALL SECTION ── */
+    .install { padding: 80px 0; }
+    .install-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 40px; align-items: start;
+    }
+    @media (max-width: 700px) { .install-grid { grid-template-columns: 1fr; } }
+
+    /* ── INSTALL STEPS ── */
+    .install-steps { display: flex; flex-direction: column; gap: 0; }
+    .install-step {
+      display: grid; grid-template-columns: 48px 1fr;
+      gap: 0 20px; padding: 28px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .install-step:last-child { border-bottom: none; }
+    .install-step-num {
+      font-size: 0.75rem; font-weight: 800; color: var(--green);
+      font-family: 'Fira Code', monospace; letter-spacing: 0.05em;
+      padding-top: 3px;
+    }
+    .install-step h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+    .install-step p { color: var(--muted); font-size: 0.9rem; line-height: 1.5; }
+    .install-step a { color: var(--green); text-decoration: none; }
+    .install-step a:hover { text-decoration: underline; }
+
+    /* ── DEMO CARD ── */
+    .demo-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+    }
+    .demo-header {
+      background: var(--bg-deep);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .demo-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .demo-dot.red   { background: #ff5f57; }
+    .demo-dot.yellow{ background: #febc2e; }
+    .demo-dot.green { background: #28c840; }
+    .demo-title { font-size: 0.8rem; color: var(--muted); margin-left: 6px; }
+    .demo-body { padding: 20px; }
+
+    .comment {
+      display: flex; gap: 12px; margin-bottom: 20px;
+    }
+    .comment-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--dim); overflow: hidden; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 700; color: var(--muted);
+    }
+    .comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .comment-bubble {
+      flex: 1;
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px;
+    }
+    .comment-meta {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 10px; font-size: 0.8rem;
+    }
+    .comment-user { font-weight: 700; }
+    .comment-time { color: var(--muted); }
+    .badge-bot {
+      background: rgba(44,193,88,0.15); color: var(--green);
+      border: 1px solid rgba(44,193,88,0.3);
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
+      padding: 2px 7px; border-radius: 4px; text-transform: uppercase;
+    }
+    .code-block {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem; line-height: 1.7;
+      color: var(--text);
+    }
+    .code-block .key { color: var(--green); }
+    .code-block .val { color: #7dcfff; }
+    .code-block .comment-text { color: var(--muted); }
+    .chain-tag {
+      display: inline-block;
+      background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(124,58,237,0.3);
+      color: #9b6ef3; font-size: 0.7rem; font-weight: 700;
+      padding: 2px 8px; border-radius: 5px;
+      font-family: 'Fira Code', monospace;
+    }
+    .bot-reply { margin-top: 4px; }
+    .bot-reply-title {
+      font-weight: 700; font-size: 0.9rem; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .bot-reply-row {
+      font-size: 0.82rem; color: var(--muted);
+      display: flex; gap: 8px; margin-bottom: 4px;
+    }
+    .bot-reply-row strong { color: var(--text); }
+    .bot-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 12px; background: rgba(44,193,88,0.1);
+      border: 1px solid rgba(44,193,88,0.3);
+      color: var(--green); font-size: 0.82rem; font-weight: 600;
+      padding: 7px 14px; border-radius: 7px; text-decoration: none;
+    }
+
+    /* ── CHAIN SUPPORT ── */
+    .chains { padding: 80px 0; }
+    .chains-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 600px) { .chains-grid { grid-template-columns: 1fr; } }
+    .chain-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 24px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .chain-card:hover { transform: translateY(-2px); }
+    .chain-card.pumpfun:hover  { border-color: rgba(0,192,77,0.5); }
+    .chain-card.bags:hover     { border-color: rgba(0,170,85,0.5); }
+    .chain-card.clanker:hover  { border-color: rgba(124,58,237,0.5); }
+    .chain-card.fourmeme:hover { border-color: rgba(217,119,6,0.5); }
+    .chain-card-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+    }
+    .chain-card-logo {
+      width: 40px; height: 40px; border-radius: 10px; object-fit: cover;
+    }
+    .chain-card-info h4 { font-weight: 700; font-size: 1rem; }
+    .chain-card-info span { font-size: 0.8rem; color: var(--muted); }
+    .chain-card p { font-size: 0.875rem; color: var(--muted); line-height: 1.5; }
+    .chain-badge {
+      display: inline-block; font-size: 0.7rem; font-weight: 700;
+      padding: 2px 8px; border-radius: 4px; margin-top: 10px;
+      font-family: 'Fira Code', monospace;
+    }
+    .chain-badge.pumpfun  { background: rgba(0,192,77,0.12);  color: #00c04d; }
+    .chain-badge.bags     { background: rgba(0,170,85,0.12);  color: #00aa55; }
+    .chain-badge.clanker  { background: rgba(124,58,237,0.12); color: #9b6ef3; }
+    .chain-badge.fourmeme { background: rgba(217,119,6,0.12); color: #f59e0b; }
+
+    /* ── POWERED BY ── */
+    .powered { padding: 60px 0; border-top: 1px solid var(--border); }
+    .powered-label {
+      text-align: center; font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 32px;
+    }
+    .powered-logos {
+      display: flex; align-items: center; justify-content: center;
+      gap: 40px; flex-wrap: wrap;
+    }
+    .powered-logo {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      opacity: 0.6; transition: opacity 0.2s;
+    }
+    .powered-logo:hover { opacity: 1; }
+    .powered-logo img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; }
+    .powered-logo span { font-size: 0.75rem; font-weight: 600; color: var(--muted); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      text-align: center; padding: 32px 24px;
+      font-size: 0.8rem; color: var(--muted);
+    }
+    footer a { color: var(--green); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      border: none; border-top: 1px solid var(--border); margin: 0;
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <img src="https://gitpump.com/logo.png" alt="GitPump" />
-    <h1>GitPump</h1>
-    <p>Launch tokens from GitHub. Redirecting you now...</p>
-    <a href="https://gitpump.com">Go to gitpump.com</a>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="https://gitpump.com">
+      <img src="https://gitpump.com/gitpump-logo.png" alt="GitPump" />
+      <span>Git<em>Pump</em></span>
+    </a>
+    <div class="nav-right">
+      <a class="nav-x" href="https://x.com/gitpumpdev" target="_blank" rel="noopener noreferrer" title="Follow on X (Twitter)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622Zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+      <a class="nav-cta" href="https://github.com/apps/gitpump-com" target="_blank" rel="noopener">Install GitPump Bot</a>
+    </div>
   </div>
-  <script>window.location.replace('https://gitpump.com');</script>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>In Code We Trust,<br><em>On GitHub We Launch.</em></h1>
+  <p>GitPump upgrades token launches with structured, GitHub-powered execution, reducing random and misleading tokens while creating a safer and more trustworthy experience for both developers and buyers.</p>
+  <div class="hero-actions">
+    <a class="btn-primary" href="https://github.com/orgs/gitpumpbot/discussions/categories/show-and-tell" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 98 96" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;margin-right:7px"><path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z" fill="#000"/></svg>
+      Launch on GitHub
+    </a>
+    <a class="btn-ghost" href="https://gitpump.com/" target="_blank" rel="noopener">View Recently Launched</a>
+  </div>
+</section>
+
+<!-- CHAINS STRIP -->
+<div class="chains-strip">
+  <div class="chain-pill pumpfun">
+    <img src="https://gitpump.com/gitpump-pumpfun-logo.png" alt="Pump.fun" />
+    Pump.fun
+  </div>
+  <div class="chain-pill bags">
+    <img src="https://gitpump.com/gitpump-bags-logo.png" alt="Bags.fm" />
+    Bags.fm
+  </div>
+  <div class="chain-pill clanker">
+    <img src="https://gitpump.com/gitpump-clanker-logo.png" alt="Clanker" />
+    Clanker
+  </div>
+  <div class="chain-pill fourmeme">
+    <img src="https://gitpump.com/gitpump-fourmeme-logo.png" alt="Four.meme" />
+    Four.meme
+  </div>
+</div>
+
+<hr class="section-divider" />
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <div class="wrap">
+    <div class="section-header">
+      <div class="section-label">How It Works</div>
+      <div class="section-title">From a GitHub comment<br>to live on chain</div>
+      <p class="section-sub">No wallet setup on your end. No scripts. Just a comment.</p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Open an Issue</h3>
+          <p>Go to the GitPump repo or any repo where the bot is installed and open an issue. Anyone with a GitHub account can participate.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Drop a Comment</h3>
+          <p>Post a <code style="font-family:'Fira Code',monospace;color:var(--green);font-size:0.85em">/launch</code> command with your token name, symbol, description, target chain, and a logo image attached.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Bot Does the Rest</h3>
+          <p>The GitPump bot downloads your logo, uploads it to IPFS, generates a fresh wallet, and deploys your token directly on your chosen chain — Pump.fun, Bags.fm, Clanker, or Four.meme.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Go Live</h3>
+          <p>Your token is live on chain and appears on the <a href="https://gitpump.com" style="color:var(--green);text-decoration:none">gitpump.com</a> live feed for everyone to see. Claim your creator fees any time with <code style="font-family:'Fira Code',monospace;color:var(--green);font-size:0.85em">/claim</code>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider" />
+
+<!-- INSTALL FOR YOUR REPO -->
+<section class="install">
+  <div class="wrap">
+    <div class="section-header">
+      <div class="section-label">For Your Repo</div>
+      <div class="section-title">Install GitPump Bot<br>in Your Repo</div>
+      <p class="section-sub">Give your repo its own <code style="font-family:'Fira Code',monospace;color:var(--green);font-size:0.85em">/launch</code> command across all supported chains.</p>
+    </div>
+
+    <div class="install-grid">
+      <!-- Steps -->
+      <div class="install-steps">
+        <div class="install-step">
+          <div class="install-step-num">01</div>
+          <div>
+            <h3>Install from GitHub Marketplace</h3>
+            <p>Visit <a href="https://github.com/apps/gitpump-com">GitPump Bot</a> and click <strong>Install</strong>. No credit card required. Free plan available.</p>
+          </div>
+        </div>
+        <div class="install-step">
+          <div class="install-step-num">02</div>
+          <div>
+            <h3>Choose Your Repository</h3>
+            <p>Select which repos get access — all repositories or specific ones. Change this any time from your GitHub App settings.</p>
+          </div>
+        </div>
+        <div class="install-step">
+          <div class="install-step-num">03</div>
+          <div>
+            <h3>Open an Issue or PR</h3>
+            <p>Create a new issue or use an existing one. The bot listens to all issue and PR comments in repos where it is installed.</p>
+          </div>
+        </div>
+        <div class="install-step">
+          <div class="install-step-num">04</div>
+          <div>
+            <h3>Post the /launch Command</h3>
+            <p>Write a comment with the command, pick your chain, and attach a logo image. GitHub account must be at least 14 days old.</p>
+          </div>
+        </div>
+        <div class="install-step">
+          <div class="install-step-num">05</div>
+          <div>
+            <h3>Bot Replies with Your Token Link</h3>
+            <p>GitPump uploads your logo to IPFS, deploys the token on your chosen chain, and replies with a direct link. Your token also appears on the gitpump.com live feed.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Demo card -->
+      <div>
+        <div class="demo-card">
+          <div class="demo-header">
+            <div class="demo-dot red"></div>
+            <div class="demo-dot yellow"></div>
+            <div class="demo-dot green"></div>
+            <span class="demo-title">yourrepo / Issues / Token Launch</span>
+          </div>
+          <div class="demo-body">
+
+            <!-- User comment -->
+            <div class="comment">
+              <div class="comment-avatar">
+                <img src="https://gitpump.com/toly-avatar.png" alt="you" />
+              </div>
+              <div class="comment-bubble">
+                <div class="comment-meta">
+                  <span class="comment-user">you</span>
+                  <span class="comment-time">just now</span>
+                </div>
+                <div class="code-block">
+                  <span class="key">/launch</span> <span class="val">name</span>=MoonToken <span class="val">symbol</span>=MOON<br>
+                  <span class="val">chain</span>=<span class="comment-text">pumpfun</span>&nbsp;<span class="chain-tag">Solana</span><br>
+                  <span class="val">description</span>=Going to the moon<br>
+                  <span class="val">twitter</span>=https://x.com/moontoken<br>
+                  <br>
+                  <span class="comment-text"># moon-logo.png attached</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bot reply -->
+            <div class="comment bot-reply">
+              <div class="comment-avatar">
+                <img src="https://gitpump.com/gitpump-logo.png" alt="GitPump Bot" />
+              </div>
+              <div class="comment-bubble">
+                <div class="comment-meta">
+                  <span class="comment-user">GitPump Bot</span>
+                  <span class="badge-bot">BOT</span>
+                  <span class="comment-time">just now</span>
+                </div>
+                <div class="bot-reply-title">
+                  🚀 Token launched successfully!
+                </div>
+                <div class="bot-reply-row"><strong>Name</strong> MoonToken (MOON)</div>
+                <div class="bot-reply-row"><strong>Chain</strong> Pump.fun (Solana)</div>
+                <div class="bot-reply-row"><strong>Logo</strong> Uploaded to IPFS</div>
+                <a class="bot-link" href="https://pump.fun" target="_blank" rel="noopener">
+                  ↗ View on Pump.fun
+                </a>
+              </div>
+            </div>
+
+            <!-- Command reference -->
+            <div style="margin-top:16px;padding:14px;background:var(--bg-deep);border:1px solid var(--border);border-radius:10px;">
+              <div style="font-size:0.75rem;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:0.05em;">COMMAND FORMAT</div>
+              <div class="code-block" style="font-size:0.78rem;line-height:1.8;">
+                <span class="key">/launch</span> <span class="val">name</span>=YourToken <span class="val">symbol</span>=TICKER<br>
+                <span class="val">chain</span>=<span class="comment-text">pumpfun | bags | clanker | fourmeme</span><br>
+                <span class="val">description</span>=Your token description<br>
+                <span class="val">twitter</span>=https://x.com/yourhandle<br>
+                <span class="val">website</span>=https://yoursite.com
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider" />
+
+<!-- SUPPORTED CHAINS -->
+<section class="chains">
+  <div class="wrap">
+    <div class="section-header">
+      <div class="section-label">Supported Chains</div>
+      <div class="section-title">Launch on 4 platforms,<br>one command</div>
+      <p class="section-sub">Pick your chain in the comment. The bot handles the rest.</p>
+    </div>
+
+    <div class="chains-grid">
+      <div class="chain-card pumpfun">
+        <div class="chain-card-header">
+          <img class="chain-card-logo" src="https://gitpump.com/gitpump-pumpfun-logo.png" alt="Pump.fun" />
+          <div class="chain-card-info">
+            <h4>Pump.fun</h4>
+            <span>Solana</span>
+          </div>
+        </div>
+        <p>The largest Solana meme token launchpad. Tokens go live instantly with bonding curves and built-in liquidity migration.</p>
+        <div class="chain-badge pumpfun">chain=pumpfun</div>
+      </div>
+
+      <div class="chain-card bags">
+        <div class="chain-card-header">
+          <img class="chain-card-logo" src="https://gitpump.com/gitpump-bags-logo.png" alt="Bags.fm" />
+          <div class="chain-card-info">
+            <h4>Bags.fm</h4>
+            <span>Solana</span>
+          </div>
+        </div>
+        <p>A growing Solana launchpad with fee-sharing built in. Earn fees from every trade your token generates.</p>
+        <div class="chain-badge bags">chain=bags</div>
+      </div>
+
+      <div class="chain-card clanker">
+        <div class="chain-card-header">
+          <img class="chain-card-logo" src="https://gitpump.com/gitpump-clanker-logo.png" alt="Clanker" />
+          <div class="chain-card-info">
+            <h4>Clanker</h4>
+            <span>Base</span>
+          </div>
+        </div>
+        <p>The leading token launchpad on Base. Deploy ERC-20 tokens with automatic Uniswap v3 pool creation and perpetual fee splits.</p>
+        <div class="chain-badge clanker">chain=clanker</div>
+      </div>
+
+      <div class="chain-card fourmeme">
+        <div class="chain-card-header">
+          <img class="chain-card-logo" src="https://gitpump.com/gitpump-fourmeme-logo.png" alt="Four.meme" />
+          <div class="chain-card-info">
+            <h4>Four.meme</h4>
+            <span>BSC</span>
+          </div>
+        </div>
+        <p>The top meme token launchpad on BNB Chain. Reach a massive audience with instant BEP-20 token deployment.</p>
+        <div class="chain-badge fourmeme">chain=fourmeme</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider" />
+
+<!-- POWERED BY -->
+<section class="powered">
+  <div class="wrap">
+    <div class="powered-label">Powered By</div>
+    <div class="powered-logos">
+      <div class="powered-logo">
+        <svg width="36" height="36" viewBox="0 0 98 96" xmlns="http://www.w3.org/2000/svg" style="border-radius:8px;background:#fff;padding:4px">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z" fill="#24292f"/>
+        </svg>
+        <span>GitHub</span>
+      </div>
+      <div class="powered-logo">
+        <img src="https://gitpump.com/gitpump-pumpfun-logo.png" alt="Pump.fun" />
+        <span>Pump.fun</span>
+      </div>
+      <div class="powered-logo">
+        <img src="https://gitpump.com/gitpump-bags-logo.png" alt="Bags.fm" />
+        <span>Bags.fm</span>
+      </div>
+      <div class="powered-logo">
+        <img src="https://gitpump.com/gitpump-clanker-logo.png" alt="Clanker" />
+        <span>Clanker</span>
+      </div>
+      <div class="powered-logo">
+        <img src="https://gitpump.com/gitpump-fourmeme-logo.png" alt="Four.meme" />
+        <span>Four.meme</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>
+    &copy; 2026 GitPump &nbsp;·&nbsp;
+    <a href="https://gitpump.com">gitpump.com</a> &nbsp;·&nbsp;
+    <a href="https://github.com/apps/gitpump-com">GitHub App</a>
+  </p>
+</footer>
+
 </body>
 </html>
